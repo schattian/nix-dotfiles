@@ -16,20 +16,19 @@ general {
         markup = "pango"
 }
 
-order += "volume master"
-order += "wireless _first_"
+#order += "volume master"
 order += "disk /"
 order += "memory"
-order += "cpu_temperature 0"
+#order += "cpu_temperature 0"
 order += "tztime localdate"
-order += "battery 1"
+#order += "battery 1"
 order += "tztime localtime"
 # order += "load"
-# order += "cpu_usage"
-# order += "disk /home"
+order += "cpu_usage"
+order += "disk /home"
 # order += "ipv6"
 # order += "run_watch VPN"
-# order += "ethernet eno16777736"
+order += "ethernet eno16777736"
 # order += "run_watch DHCP"
 
 volume master {

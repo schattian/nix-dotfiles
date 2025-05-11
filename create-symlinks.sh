@@ -1,5 +1,5 @@
 mkdir -p ~/.config ~/.config/i3 ~/.config/i3status
-sudo ln -s ./i3config ~/.config/i3/i3config
-sudo ln -s ./i3status ~/.config/i3status/config
-sudo cp /etc/nixos/configuration.nix /etc/nixos/configuration.nix.old 
-sudo ln -s ./configuration.nix /etc/nixos/configuration.nix
+sudo ln -s /home/schattian/dotfiles/i3config ~/.config/i3/config
+sudo ln -s /home/schattian/dotfiles/i3statusconfig ~/.config/i3status/config
+sudo mv /etc/nixos/configuration.nix /etc/nixos/configuration.nix.old 
+sudo ln -s /home/schattian/dotfiles/configuration.nix /etc/nixos/configuration.nix

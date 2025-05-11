@@ -4,6 +4,7 @@
 
   imports = [
     /etc/nixos/hardware-configuration.nix
+    /etc/nixos/nvidia.nix
   ];
 
   # paste your boot config here...
@@ -105,9 +106,10 @@
 
   environment.systemPackages = with pkgs; [
     alacritty
+    arandr
     dmenu
     git
-    gnome.gnome-keyring
+    kitty
     nerdfonts
     networkmanagerapplet
     nitrogen
@@ -117,6 +119,8 @@
     pulseaudioFull
     rofi
     vim
+    vscode 
+    spotify 
     unrar
     unzip
   ];
@@ -148,11 +152,6 @@
     };
   };
 
-
-  
-
-
-  
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
