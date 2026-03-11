@@ -1,11 +1,26 @@
 { config, pkgs, ... }:
 
+
+
+let
+  unstable = import (builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  }) {
+    config = { allowUnfree = true; };  # <--- important
+ };
+in
+
 {
 
   imports = [
     /etc/nixos/hardware-configuration.nix
     /etc/nixos/nvidia.nix
   ];
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.extraOptions = ''
+      trusted-users = root schattian
+  '';
 
   # paste your boot config here...
   boot.loader.systemd-boot.enable = true;
@@ -22,6 +37,7 @@
     networkmanager.enable = true;
   };
 
+ 
   # edit as per your location and timezone
   time.timeZone = "America/Buenos_Aires";
   i18n = {
@@ -36,7 +52,6 @@
       LC_PAPER = "en_US.UTF-8";
       LC_TELEPHONE = "en_US.UTF-8";
       LC_TIME = "en_US.UTF-8";
-#      LC_CTYPE="en_US.utf8"; # required by dmenu don't change this
     };
   };
 
@@ -50,9 +65,12 @@
           enable = true;
       };
     };
+    displayManager = {
+      defaultSession = "xfce+i3";
+    };
     xserver = {
-      layout = "us";
-      xkbVariant = "";
+      xautolock.time = 1800;
+      xkb = { variant = ""; layout = "us"; };      
       enable = true;
       windowManager.i3 = {
         enable = true;
@@ -70,7 +88,6 @@
       };
       displayManager = {
         lightdm.enable = true;
-        defaultSession = "xfce+i3";
       };
     };
     gvfs.enable = true;
@@ -91,36 +108,58 @@
       allowUnfree = true;
       pulseaudio = true;
     };
+
+    overlays = [
+     (self: super: {
+      spotify = unstable.spotify;
+    })
+  ];
   };
+
+
 
   # Edit the username below (replace 'neeraj')
   users.users.schattian = {
     isNormalUser = true;
     description = "schattian";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       google-chrome 
       xarchiver
     ];
   };
+  hardware.logitech.wireless.enable = true;
+  hardware.logitech.wireless.enableGraphical = true;
 
+  services.udev.extraRules = ''
+    # Logitech Unifying Receiver
+    SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c52b", MODE="0666"
+  '';
+
+  
   environment.systemPackages = with pkgs; [
     alacritty
     arandr
+    azure-cli
+    appimage-run
     dmenu
     git
     kitty
-    nerdfonts
     networkmanagerapplet
     nitrogen
+    imagemagick
+    logiops
     pasystray
     picom
+    stremio    
     polkit_gnome
     pulseaudioFull
     rofi
     vim
-    vscode 
-    spotify 
+    vscode
+    slack
+    solaar
+    spotify
     unrar
     unzip
   ];
@@ -128,6 +167,12 @@
   programs = {
     thunar.enable = true;
     dconf.enable = true;
+    nh = {
+	    enable = true;
+	    clean.enable = true;
+	    clean.extraArgs = "--keep-since 4d --keep 3";
+	    flake = "/home/user/my-nixos-config";
+    };
   };
 
   security = {
@@ -156,8 +201,49 @@
     enable = true;
     powerOnBoot = true;
   };
+ 
 
-
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
+  };
   # Don't touch this
   system.stateVersion = "23.05";
+
+  xdg.portal = {
+	  enable = true;
+	  xdgOpenUsePortal = true;
+	  config = {
+		  common.default = [ "gtk" ];
+	  };
+	  extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
+
+
+  services.pipewire.extraConfig = {
+	  pipewire."99-klipsch" = {
+		  "context.properties" = {
+			  "default.clock.rate" = 48000;
+			  "default.clock.allowed-rates" = [ 48000 ];
+		  };
+	  };
+
+	  pipewire-pulse."99-klipsch" = {
+		  "context.properties" = {
+			  "default.clock.rate" = 48000;
+			  "default.clock.allowed-rates" = [ 48000 ];
+		  };
+	  };
+
+	  pipewire."99-klipsch-buffers" = {
+		  "context.properties" = {
+			  "default.clock.min-quantum" = 1024;
+			  "default.clock.max-quantum" = 2048;
+		  };
+	  };
+
+  };
+
+
 }
+  
