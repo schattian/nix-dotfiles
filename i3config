@@ -237,3 +237,7 @@ assign [class="argo"] 7
 assign [class="Code"] 3
 assign [class="Slack"] 4
 assign [class="Spotify"] 10
+
+# No shutdown monitor
+exec --no-startup-id xset -dpms
+exec --no-startup-id xset s off
